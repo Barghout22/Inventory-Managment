@@ -7,15 +7,11 @@ console.log(
 // Get arguments passed on command line
 const userArgs = process.argv.slice(2);
 
-const Book = require("./models/book");
-const Author = require("./models/author");
-const Genre = require("./models/genre");
-const BookInstance = require("./models/bookinstance");
+const Category = require("./models/category");
+const Item = require("./models/item");
 
-const genres = [];
-const authors = [];
-const books = [];
-const bookinstances = [];
+const categories = [];
+const items = [];
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false); // Prepare for Mongoose 7
@@ -28,10 +24,9 @@ async function main() {
   console.log("Debug: About to connect");
   await mongoose.connect(mongoDB);
   console.log("Debug: Should be connected?");
-  await createGenres();
-  await createAuthors();
-  await createBooks();
-  await createBookInstances();
+  await createCategories();
+  await createItems();
+
   console.log("Debug: Closing mongoose");
   mongoose.connection.close();
 }
@@ -39,191 +34,158 @@ async function main() {
 // We pass the index to the ...Create functions so that, for example,
 // genre[0] will always be the Fantasy genre, regardless of the order
 // in which the elements of promise.all's argument complete.
-async function genreCreate(index, name) {
-  const genre = new Genre({ name: name });
-  await genre.save();
-  genres[index] = genre;
-  console.log(`Added genre: ${name}`);
+async function categoryCreate(index, name, description) {
+  const category = new Category({ name: name, description: description });
+  await category.save();
+  categories[index] = category;
+  console.log(`Added category: ${name}`);
 }
 
-async function authorCreate(index, first_name, family_name, d_birth, d_death) {
-  const authordetail = { first_name: first_name, family_name: family_name };
-  if (d_birth != false) authordetail.date_of_birth = d_birth;
-  if (d_death != false) authordetail.date_of_death = d_death;
-
-  const author = new Author(authordetail);
-
-  await author.save();
-  authors[index] = author;
-  console.log(`Added author: ${first_name} ${family_name}`);
-}
-
-async function bookCreate(index, title, summary, isbn, author, genre) {
-  const bookdetail = {
-    title: title,
-    summary: summary,
-    author: author,
-    isbn: isbn,
+async function itemCreate(
+  index,
+  name,
+  description,
+  category,
+  price,
+  number_in_stock
+) {
+  const itemdetail = {
+    name: name,
+    description: description,
+    category: category,
+    price: price,
+    number_in_stock: number_in_stock,
   };
-  if (genre != false) bookdetail.genre = genre;
 
-  const book = new Book(bookdetail);
-  await book.save();
-  books[index] = book;
-  console.log(`Added book: ${title}`);
+  const item = new Item(itemdetail);
+
+  await item.save();
+  items[index] = item;
+  console.log(`Added item: ${name}`);
 }
 
-async function bookInstanceCreate(index, book, imprint, due_back, status) {
-  const bookinstancedetail = {
-    book: book,
-    imprint: imprint,
-  };
-  if (due_back != false) bookinstancedetail.due_back = due_back;
-  if (status != false) bookinstancedetail.status = status;
-
-  const bookinstance = new BookInstance(bookinstancedetail);
-  await bookinstance.save();
-  bookinstances[index] = bookinstance;
-  console.log(`Added bookinstance: ${imprint}`);
-}
-
-async function createGenres() {
-  console.log("Adding genres");
+async function createCategories() {
+  console.log("Adding Categories");
   await Promise.all([
-    genreCreate(0, "Fantasy"),
-    genreCreate(1, "Science Fiction"),
-    genreCreate(2, "French Poetry"),
-  ]);
-}
-
-async function createAuthors() {
-  console.log("Adding authors");
-  await Promise.all([
-    authorCreate(0, "Patrick", "Rothfuss", "1973-06-06", false),
-    authorCreate(1, "Ben", "Bova", "1932-11-8", false),
-    authorCreate(2, "Isaac", "Asimov", "1920-01-02", "1992-04-06"),
-    authorCreate(3, "Bob", "Billings", false, false),
-    authorCreate(4, "Jim", "Jones", "1971-12-16", false),
-  ]);
-}
-
-async function createBooks() {
-  console.log("Adding Books");
-  await Promise.all([
-    bookCreate(
-      0,
-      "The Name of the Wind (The Kingkiller Chronicle, #1)",
-      "I have stolen princesses back from sleeping barrow kings. I burned down the town of Trebon. I have spent the night with Felurian and left with both my sanity and my life. I was expelled from the University at a younger age than most people are allowed in. I tread paths by moonlight that others fear to speak of during day. I have talked to Gods, loved women, and written songs that make the minstrels weep.",
-      "9781473211896",
-      authors[0],
-      [genres[0]]
-    ),
-    bookCreate(
+    categoryCreate(0, "CPU", "central processing unit "),
+    categoryCreate(
       1,
-      "The Wise Man's Fear (The Kingkiller Chronicle, #2)",
-      "Picking up the tale of Kvothe Kingkiller once again, we follow him into exile, into political intrigue, courtship, adventure, love and magic... and further along the path that has turned Kvothe, the mightiest magician of his age, a legend in his own time, into Kote, the unassuming pub landlord.",
-      "9788401352836",
-      authors[0],
-      [genres[0]]
+      "Video card",
+      "a computer expansion card that generates a feed of graphics output to a display device such as a monitor"
     ),
-    bookCreate(
+    categoryCreate(
       2,
-      "The Slow Regard of Silent Things (Kingkiller Chronicle)",
-      "Deep below the University, there is a dark place. Few people know of it: a broken web of ancient passageways and abandoned rooms. A young woman lives there, tucked among the sprawling tunnels of the Underthing, snug in the heart of this forgotten place.",
-      "9780756411336",
-      authors[0],
-      [genres[0]]
+      "Power supply",
+      "A power supply unit (PSU) converts mains AC to low-voltage regulated DC power for the internal components of a computer."
     ),
-    bookCreate(
+    categoryCreate(
       3,
-      "Apes and Angels",
-      "Humankind headed out to the stars not for conquest, nor exploration, nor even for curiosity. Humans went to the stars in a desperate crusade to save intelligent life wherever they found it. A wave of death is spreading through the Milky Way galaxy, an expanding sphere of lethal gamma ...",
-      "9780765379528",
-      authors[1],
-      [genres[1]]
+      "Memory",
+      "Random-access memory (RAM; /ræm/) is a form of computer memory that can be read and changed in any order, typically used to store working data and machine code."
     ),
-    bookCreate(
+    categoryCreate(
       4,
-      "Death Wave",
-      "In Ben Bova's previous novel New Earth, Jordan Kell led the first human mission beyond the solar system. They discovered the ruins of an ancient alien civilization. But one alien AI survived, and it revealed to Jordan Kell that an explosion in the black hole at the heart of the Milky Way galaxy has created a wave of deadly radiation, expanding out from the core toward Earth. Unless the human race acts to save itself, all life on Earth will be wiped out...",
-      "9780765379504",
-      authors[1],
-      [genres[1]]
+      "Storage",
+      "Computer data storage is a technology consisting of computer components and recording media that are used to retain digital data. It is a core function and fundamental component of computers"
     ),
-    bookCreate(
+    categoryCreate(
       5,
-      "Test Book 1",
-      "Summary of test book 1",
-      "ISBN111111",
-      authors[4],
-      [genres[0], genres[1]]
-    ),
-    bookCreate(
-      6,
-      "Test Book 2",
-      "Summary of test book 2",
-      "ISBN222222",
-      authors[4],
-      false
+      "Operating system ",
+      "An operating system (OS) is system software that manages computer hardware and software resources, and provides common services for computer programs."
     ),
   ]);
 }
 
-async function createBookInstances() {
-  console.log("Adding authors");
+async function createItems() {
+  console.log("Adding items");
   await Promise.all([
-    bookInstanceCreate(
+    itemCreate(
       0,
-      books[0],
-      "London Gollancz, 2014.",
-      false,
-      "Available"
+      "AMD Ryzen 5 5600X 3.7 GHz 6-Core Processor",
+      "Perfect budget-friendly processor for gaming at 4K. At least twice as powerful as PS4/XB1 processors, and roughly on-par with the processors 9th gen PS5/Series X consoles are now using, but with 2 fewer cores.",
+      categories[0],
+      162,
+      15
     ),
-    bookInstanceCreate(1, books[1], " Gollancz, 2011.", false, "Loaned"),
-    bookInstanceCreate(2, books[2], " Gollancz, 2015.", false, false),
-    bookInstanceCreate(
+    itemCreate(
+      1,
+      "AMD Ryzen 7 5800X 3.8 GHz 8-Core Processor",
+      "The Elite Gaming Processor. 8 cores optimized for high-FPS gaming rigs.",
+      categories[0],
+      227,
+      12
+    ),
+    itemCreate(
+      10,
+      "MSI GeForce RTX 3060 Ventus 2X 12G",
+      " VENTUS brings a performance-focused design that maintains the essentials to accomplish any task at hand.",
+      categories[1],
+      290,
+      5
+    ),
+    itemCreate(
+      11,
+      "Gigabyte WINDFORCE OC",
+      "The WINDFORCE cooling system features three 80mm unique blade fans, alternate spinning, 3 composite copper heat pipes directly touches the GPU, 3D active fans and Screen cooling, which together provide high efficiency heat dissipation.",
+      categories[1],
+      600,
+      18
+    ),
+    itemCreate(
+      2,
+      "Corsair RM750e (2023)",
+      "CORSAIR RMe Series Fully Modular Low-Noise Power Supplies provide quiet, reliable power with 80 PLUS Gold efficiency to your PC",
+      categories[2],
+      100,
+      10
+    ),
+    itemCreate(
       3,
-      books[3],
-      "New York Tom Doherty Associates, 2016.",
-      false,
-      "Available"
+      "Corsair RM850x (2021)",
+      "CORSAIR RM850x Series fully modular power supplies with EPS12V connectors are built with the highest quality components to deliver 80 PLUS Gold efficient power to your PC,with virtually silent operation.",
+      categories[2],
+      130,
+      35
     ),
-    bookInstanceCreate(
+    itemCreate(
       4,
-      books[3],
-      "New York Tom Doherty Associates, 2016.",
-      false,
-      "Available"
+      "Corsair Vengeance LPX 16 GB",
+      "VENGEANCE LPX memory is designed for high-performance overclocking.",
+      categories[3],
+      38,
+      2
     ),
-    bookInstanceCreate(
+    itemCreate(
       5,
-      books[3],
-      "New York Tom Doherty Associates, 2016.",
-      false,
-      "Available"
+      "Corsair Vengeance RGB Pro 32 GB",
+      "CORSAIR VENGEANCE RGB PRO Series DDR4 memory lights up your PC with mesmerizing dynamic multi-zone RGB lighting, while delivering the best in DDR4 performance and stability.",
+      categories[3],
+      105,
+      13
     ),
-    bookInstanceCreate(
+    itemCreate(
       6,
-      books[4],
-      "New York, NY Tom Doherty Associates, LLC, 2015.",
-      false,
-      "Available"
+      "Samsung 970 Evo Plus",
+      "The ultimate in performance, upgraded. Faster than the 970 EVO, the 970 EVO Plus is powered by the latest V-NAND technology and firmware optimization. It maximizes the potential of NVMe™ bandwidth for unbeatable computing. In capacities up to 2TB, with reliability of up to 1,200 TBW.",
+      categories[4],
+      55,
+      19
     ),
-    bookInstanceCreate(
+    itemCreate(
       7,
-      books[4],
-      "New York, NY Tom Doherty Associates, LLC, 2015.",
-      false,
-      "Maintenance"
+      "Samsung 980 Pro",
+      "Unleash the power of the Samsung PCIe® 4.0 NVMe™ SSD 980 PRO for your next-level computing. Leveraging the PCIe® 4.0 interface, the 980 PRO delivers double the data transfer rate of PCIe® 3.0 while being backward compatible for PCIe® 3.0 for added versatility.",
+      categories[4],
+      100,
+      24
     ),
-    bookInstanceCreate(
+    itemCreate(
       8,
-      books[4],
-      "New York, NY Tom Doherty Associates, LLC, 2015.",
-      false,
-      "Loaned"
+      "Microsoft Windows 11 Home (64-bit)",
+      "Windows 11 is the latest major release of Microsoft's Windows NT operating system, released on October 5, 2021. It was a free upgrade to its predecessor, Windows 10 (2015), and is available for any Windows 10 devices that meet the new Windows 11 system requirements.",
+      categories[5],
+      100,
+      11
     ),
-    bookInstanceCreate(9, books[0], "Imprint XXX2", false, false),
-    bookInstanceCreate(10, books[1], "Imprint XXX3", false, false),
   ]);
 }
