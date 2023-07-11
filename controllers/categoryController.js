@@ -1,12 +1,28 @@
 const Category = require("../models/category");
+const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
 
 exports.index = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Site Home Page");
+  const [numCategories, numItems] = await Promise.all([
+    Category.countDocuments({}).exec(),
+    Item.countDocuments({}).exec(),
+  ]);
+
+  res.render("index", {
+    title: "Inventory homepage",
+    number_of_categories: numCategories,
+    number_of_items: numItems,
+  });
 });
 
 exports.category_list = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: category list`);
+  const allCategories = await Category.find({}, "name")
+    .sort({ name: 1 })
+    .exec();
+  res.render("category_list", {
+    title: "list of item categories",
+    category_list: allCategories,
+  });
 });
 exports.category_detail = asyncHandler(async (req, res, next) => {
   res.send(`NOT IMPLEMENTED: category detail: ${req.params.id}`);

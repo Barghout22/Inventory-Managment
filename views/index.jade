@@ -2,4 +2,13 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to the #[em Inventory],a basic inventory managment system to categorize and display various pc parts.
+
+  h1 Dynamic content
+
+  p The inventory has the following record counts:
+
+  ul
+    li #[strong categories:] !{number_of_categories}
+    li #[strong Copies:] !{number_of_items}
+
