@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1=title 
+  
+  h2  #{requested_item.name} in 
+   a(href=requested_item.category.url) #{requested_item.category.name}
+   |category 
+  p #{requested_item.description}
+  p price:$ #{requested_item.price}
+  
+  if requested_item.number_in_stock>0
+    p there are #{requested_item.number_in_stock} of this item in stock 
+  else 
+    p this item is out of stock
+    
+  
+  a(href=requested_item.url+"/update")    
+    button update item
+
+  a(href=requested_item.url+"/delete")
+    button delete item

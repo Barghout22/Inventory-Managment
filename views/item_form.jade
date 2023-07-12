@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h1= title
+  form(method='POST' action='')
+   label(for="name")
+   input#name(type="text" name="name" required=true placeholder="name of the item" value=(undefined===item?'':item.name)) 
+   label(for="description")
+   textarea#description(name="description", cols="70", rows="20" required=true placeholder="description of the item" value=(undefined===item?'':item.description))
+   label(for='category') category:
+      select#category(type='select', placeholder='Select category' name='category' required='true' )
+        for category in allCategories
+            if item 
+              option(value=category._id selected=(category._id.toString()===item.category._id.toString() ? 'selected' : false) ) #{category.name}
+            else
+              option(value=category._id) #{category.name}
+    label(for="price")
+    input#price(type="number" name="price" required=true placeholder="price of the item" value=(undefined===item?'':item.price))
+    label(for="numStock")
+    input#numStock(type="number" name="number_in_stock" required=true placeholder="available stock of item" value=(undefined===item?'':item.number_in_stock))
+    button.btn.btn-primary(type='submit') Submit
+  if errors
+   ul
+     for error in errors
+       li!= error.msg

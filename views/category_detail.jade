@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  h1=title 
+  
+  p #{requested_category.name}: #{requested_category.description}
+  if items_in_category.length>0
+    p items in this category:
+    dl 
+     each item in items_in_category 
+      dt 
+        a(href=item.url) #{item.name}
+      dd #{item.description}
+  else 
+    p there are no items in this category
+      
+  a(href=requested_category.url+"/update")    
+    button update category
+
+  a(href=requested_category.url+"/delete")
+    button delete category

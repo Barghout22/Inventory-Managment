@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='name') Category:
+      input#name.form-control(type='text', placeholder='CPU,GPU,etc...' name='name' value=(undefined===category ? '' : category.name) required=true)
+      label(for="description") Description:
+      textarea#description.form-control(name="description" cols="70" rows="20" placeholder="describe this category" value=(undefined===category ? '' : category.description) required=true) 
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors
+   ul
+    for error in errors
+     li!= error.msg
