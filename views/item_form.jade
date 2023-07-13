@@ -3,10 +3,10 @@ extends layout
 block content
   h1= title
   form(method='POST' action='')
-   label(for="name")
+   label(for="name") name:
    input#name(type="text" name="name" required=true placeholder="name of the item" value=(undefined===item?'':item.name)) 
-   label(for="description")
-   textarea#description(name="description", cols="70", rows="20" required=true placeholder="description of the item" value=(undefined===item?'':item.description))
+   label(for="description") description:
+   input#description(type="text" name="description" required=true placeholder="description of the item" value=(undefined===item?'':item.description))
    label(for='category') category:
       select#category(type='select', placeholder='Select category' name='category' required='true' )
         for category in allCategories

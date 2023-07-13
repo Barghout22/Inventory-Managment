@@ -65,7 +65,7 @@ exports.category_create_post = [
       // There are errors. Render the form again with sanitized values/error messages.
       res.render("category_form", {
         title: "Create Category",
-        genre: category,
+        category: category,
         errors: errors.array(),
       });
       return;
@@ -85,17 +85,75 @@ exports.category_create_post = [
 ];
 
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: category delete get`);
+  const [category, allItemsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }, "name description"),
+  ]);
+  if (category === null) {
+    res.redirect("/categories");
+  }
+  res.render("delete_category", {
+    title: "Delete Category",
+    category: category,
+    allItemsInCategory: allItemsInCategory,
+  });
 });
 
 exports.category_delete_post = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: category delete post`);
+  const [category, allItemsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }, "name description"),
+  ]);
+  if (allItemsInCategory > 0) {
+    res.render("delete_category", {
+      title: "Delete Category",
+      category: category,
+      allItemsInCategory: allItemsInCategory,
+    });
+    return;
+  } else {
+    await Category.findByIdAndRemove(req.body.categoryid);
+    res.redirect("/categories");
+  }
 });
 
 exports.category_update_get = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: category update get`);
+  const category = await Category.findById(req.params.id).exec();
+  res.render("category_form", { title: "Update Category", category: category });
 });
 
-exports.category_update_post = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: category update post`);
-});
+exports.category_update_post = [
+  body("name", "category name must contain at least 3 characters")
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body("description", "category description must contain at least 3 characters")
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description,
+      _id: req.params.id,
+    });
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render("category_form", {
+        title: "update Category",
+        category: category,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      const theCateg = await Category.findByIdAndUpdate(
+        req.params.id,
+        category,
+        {}
+      );
+      // Redirect to book detail page.
+      res.redirect(theCateg.url);
+    }
+  }),
+];
