@@ -2,7 +2,7 @@ extends layout
 
 block content
   h1= title
-  form(method='POST' action='')
+  form(method='POST' action='' enctype="multipart/form-data")
    label(for="name") name:
    input#name(type="text" name="name" required=true placeholder="name of the item" value=(undefined===item?'':item.name)) 
    label(for="description") description:
@@ -14,11 +14,13 @@ block content
               option(value=category._id selected=(category._id.toString()===item.category._id.toString() ? 'selected' : false) ) #{category.name}
             else
               option(value=category._id) #{category.name}
-    label(for="price")
-    input#price(type="number" name="price" required=true placeholder="price of the item" value=(undefined===item?'':item.price))
-    label(for="numStock")
-    input#numStock(type="number" name="number_in_stock" required=true placeholder="available stock of item" value=(undefined===item?'':item.number_in_stock))
-    button.btn.btn-primary(type='submit') Submit
+   label(for="price") price:
+   input#price(type="number" name="price" required=true placeholder="price of the item" value=(undefined===item?'':item.price))
+   label(for="numStock") available quantity in stock:
+   input#numStock(type="number" name="number_in_stock" required=true placeholder="available stock of item" value=(undefined===item?'':item.number_in_stock))
+   label(for="image") upload image of product if available:
+   input#image(type="file", name="image")
+   button.btn.btn-primary(type='submit') Submit
   if errors
    ul
      for error in errors

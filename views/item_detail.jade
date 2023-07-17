@@ -2,7 +2,7 @@ extends layout
 
 block content
   h1=title 
-  
+  img(src= requested_item.image, alt="item image")
   h2  #{requested_item.name} in 
    a(href=requested_item.category.url) #{requested_item.category.name}
    |category 

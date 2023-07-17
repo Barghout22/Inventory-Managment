@@ -1,6 +1,17 @@
 var express = require("express");
 var router = express.Router();
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/images/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + ".jpg");
+  },
+});
 
+const upload = multer({ storage: storage });
 const category_controller = require("../controllers/categoryController");
 const item_controller = require("../controllers/itemController");
 
@@ -17,11 +28,19 @@ router.post("/category/:id/update", category_controller.category_update_post);
 
 router.get("/items", item_controller.item_list);
 router.get("/item/create", item_controller.item_create_get);
-router.post("/item/create", item_controller.item_create_post);
+router.post(
+  "/item/create",
+  upload.single("image"),
+  item_controller.item_create_post
+);
 router.get("/item/:id", item_controller.item_detail);
 router.get("/item/:id/delete", item_controller.item_delete_get);
 router.post("/item/:id/delete", item_controller.item_delete_post);
 router.get("/item/:id/update", item_controller.item_update_get);
-router.post("/item/:id/update", item_controller.item_update_post);
+router.post(
+  "/item/:id/update",
+  upload.single("image"),
+  item_controller.item_update_post
+);
 
 module.exports = router;

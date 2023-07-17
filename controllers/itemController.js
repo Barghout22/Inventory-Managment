@@ -53,13 +53,19 @@ exports.item_create_post = [
     .escape(),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
+    const Image = req.file ?"/images/"+req.file.filename : "/images/default-image.jpeg";
+
+    console.log(req.file);
+
     const item = new Item({
       name: req.body.name,
       description: req.body.description,
       category: req.body.category,
       price: req.body.price,
       number_in_stock: req.body.number_in_stock,
+      image: Image,
     });
+
     if (!errors.isEmpty()) {
       const allCategories = await Category.find().exec();
       res.render("item_form", {
@@ -127,8 +133,7 @@ exports.item_update_post = [
   body("number_in_stock", "number in stock must not be empty.")
     .trim()
     .isLength({ min: 1 })
-    .escape()
-  ,
+    .escape(),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     const item = new Item({
