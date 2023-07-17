@@ -53,7 +53,9 @@ exports.item_create_post = [
     .escape(),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
-    const Image = req.file ?"/images/"+req.file.filename : "/images/default-image.jpeg";
+    const Image = req.file
+      ? "/images/" + req.file.filename
+      : "/images/default-image.jpeg";
 
     console.log(req.file);
 
@@ -136,12 +138,16 @@ exports.item_update_post = [
     .escape(),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
+    const Image = req.file
+      ? "/images/" + req.file.filename
+      : "/images/default-image.jpeg";
     const item = new Item({
       name: req.body.name,
       description: req.body.description,
       category: req.body.category,
       price: req.body.price,
       number_in_stock: req.body.number_in_stock,
+      image: Image,
       _id: req.params.id,
     });
     if (!errors.isEmpty()) {
